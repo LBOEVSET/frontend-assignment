@@ -7,6 +7,12 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: [],
+    // Generate a JUnit XML report so SonarQube can display test counts
+    // (passed / failed / skipped) in the Tests metric on the dashboard.
+    reporters: ['verbose', 'junit'],
+    outputFile: {
+      junit: './test-results.xml',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'clover'],
