@@ -143,10 +143,25 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.get('/users/department-summary', async (_req: Request, res: Response) => {
+app.get('/users/department-summary', async (req: Request, res: Response) => {
   try {
+    // ?force=true invalidates the server cache for a guaranteed fresh fetch
+    if (req.query.force === 'true') {
+      cache = null;
+      inflight = null;
+      console.log('[cache] force-invalidated by client request');
+    }
+
+    const isCached = !!(cache && Date.now() - cache.ts < CACHE_TTL_MS);
+    const start = Date.now();
     const data = await getDepartmentSummary();
-    res.json(data);
+    const responseTime = Date.now() - start;
+    const cacheAge = cache ? Date.now() - cache.ts : 0;
+
+    res.json({
+      data,
+      meta: { responseTime, isCached, cacheAge },
+    });
   } catch (err) {
     console.error('[HTTP] error:', err);
     res.status(500).json({ error: String(err) });

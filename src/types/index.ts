@@ -31,3 +31,18 @@ export interface DepartmentSummary {
   hair: Record<string, number>;
   addressUser: Record<string, string>;
 }
+
+export interface ApiMeta {
+  responseTime: number; // ms
+  isCached: boolean;
+  cacheAge: number;     // ms since cache was populated
+}
+
+// ── Backend API types ─────────────────────────────────────────────────────────
+
+export interface BackendUser {
+  id: string;
+  name: string;
+  email: string;
+  created_at: string; // Go serializes as snake_case
+}

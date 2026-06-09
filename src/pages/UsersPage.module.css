@@ -46,3 +46,106 @@
 .users  { display: flex; flex-direction: column; gap: 2px; }
 .user   { font-size: 0.8rem; }
 .user code { font-size: 0.75rem; color: #6366f1; }
+
+/* ── Top row ─────────────────────────────────────────────────────────────── */
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.leftCol { display: flex; flex-direction: column; gap: 8px; }
+
+/* ── Refresh button + tooltip ────────────────────────────────────────────── */
+.refreshRow { display: flex; align-items: center; gap: 8px; }
+
+.refreshBtn {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.refreshBtn:hover { background: #4f46e5; }
+
+.tipWrap { position: relative; }
+
+.tipIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.tipIcon:hover { background: #e2e8f0; }
+
+.tooltip {
+  position: absolute;
+  left: 28px;
+  top: -4px;
+  width: 260px;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  border-radius: 8px;
+  padding: 10px 32px 10px 12px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.tooltipClose {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0;
+}
+.tooltipClose:hover { color: #f1f5f9; }
+
+/* ── Meta bar ──────────────────────────────────────────────────────────────── */
+
+.metaBar { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+.metaToggle {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #475569;
+}
+.metaToggle:hover { background: #e2e8f0; }
+
+.metaPanel {
+  display: flex;
+  gap: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  color: #475569;
+  flex-wrap: wrap;
+}
+
+.yes { color: #16a34a; font-weight: 600; }
+.no  { color: #dc2626; font-weight: 600; }

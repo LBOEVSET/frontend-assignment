@@ -1,52 +1,88 @@
 import { useState, useEffect } from 'react';
 import { TodoApp } from './components/TodoApp';
 import { UsersPage } from './pages/UsersPage';
+import { BackendPage } from './pages/BackendPage';
 import { fetchUsersByDepartment } from './services/users.service';
 import './App.css';
 
-type Tab = 'todo' | 'users';
+type Assignment = 'frontend' | 'backend';
+type FrontendTab = 'todo' | 'users';
 
-function getTabFromHash(): Tab {
+function getInitialAssignment(): Assignment {
+  return window.location.hash === '#backend' ? 'backend' : 'frontend';
+}
+function getInitialFrontendTab(): FrontendTab {
   return window.location.hash === '#users' ? 'users' : 'todo';
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>(getTabFromHash);
+  const [assignment,   setAssignment]   = useState<Assignment>(getInitialAssignment);
+  const [frontendTab,  setFrontendTab]  = useState<FrontendTab>(getInitialFrontendTab);
 
-  const switchTab = (tab: Tab) => {
-    setActiveTab(tab);
+  const switchAssignment = (a: Assignment) => {
+    setAssignment(a);
+    window.location.hash = a === 'backend' ? 'backend' : frontendTab;
+  };
+
+  const switchFrontendTab = (tab: FrontendTab) => {
+    setFrontendTab(tab);
     window.location.hash = tab;
   };
 
-  // Warm the cache while the user is on the Todo tab.
-  // StrictMode calls this twice — both calls return the same singleton Promise.
   useEffect(() => {
     fetchUsersByDepartment();
   }, []);
 
+  const title = assignment === 'frontend'
+    ? '7Solutions Frontend Assignment'
+    : '7Solutions Backend Assignment';
+
   return (
     <div className="app">
       <header className="app-header">
-        <h1 className="app-title">7Solutions Frontend Assignment</h1>
-        <nav className="tabs">
+
+        {/* ── Top assignment switcher ── */}
+        <div className="assignment-switcher">
           <button
-            className={`tab ${activeTab === 'todo' ? 'tab--active' : ''}`}
-            onClick={() => switchTab('todo')}
+            className={`assignment-btn ${assignment === 'frontend' ? 'assignment-btn--active' : ''}`}
+            onClick={() => switchAssignment('frontend')}
           >
-            1 · Auto-Delete Todo
+            Frontend Assignment
           </button>
           <button
-            className={`tab ${activeTab === 'users' ? 'tab--active' : ''}`}
-            onClick={() => switchTab('users')}
+            className={`assignment-btn ${assignment === 'backend' ? 'assignment-btn--active' : ''}`}
+            onClick={() => switchAssignment('backend')}
           >
-            2 · Users by Department
+            Backend Assignment
           </button>
-        </nav>
+        </div>
+
+        {/* ── Title ── */}
+        <h1 className="app-title">{title}</h1>
+
+        {/* ── Sub-tabs (frontend only) ── */}
+        {assignment === 'frontend' && (
+          <nav className="tabs">
+            <button
+              className={`tab ${frontendTab === 'todo' ? 'tab--active' : ''}`}
+              onClick={() => switchFrontendTab('todo')}
+            >
+              1 · Auto-Delete Todo
+            </button>
+            <button
+              className={`tab ${frontendTab === 'users' ? 'tab--active' : ''}`}
+              onClick={() => switchFrontendTab('users')}
+            >
+              2 · Users by Department
+            </button>
+          </nav>
+        )}
       </header>
 
       <main className="app-main">
-        {activeTab === 'todo'  && <TodoApp />}
-        {activeTab === 'users' && <UsersPage />}
+        {assignment === 'frontend' && frontendTab === 'todo'  && <TodoApp />}
+        {assignment === 'frontend' && frontendTab === 'users' && <UsersPage />}
+        {assignment === 'backend'                             && <BackendPage />}
       </main>
     </div>
   );

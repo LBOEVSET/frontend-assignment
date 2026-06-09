@@ -21,17 +21,49 @@ body {
 .app-header {
   background: #1a1a2e;
   color: #fff;
-  padding: 20px 32px 0;
+  padding: 0 32px 0;
 }
 
+/* ── Assignment switcher (top bar) ───────────────────────────────────────── */
+.assignment-switcher {
+  display: flex;
+  gap: 8px;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.assignment-btn {
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.assignment-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.assignment-btn--active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Title ───────────────────────────────────────────────────────────────── */
 .app-title {
-  margin: 0 0 20px;
+  margin: 16px 0 16px;
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-/* ── Tabs ────────────────────────────────────────────────────────────────── */
+/* ── Sub-tabs (frontend assignment) ──────────────────────────────────────── */
 .tabs {
   display: flex;
   gap: 4px;
