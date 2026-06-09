@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "github.com/lboevset/frontend-assignment/proto/users";
+
+// DepartmentSummaryService exposes aggregated user data grouped by department.
+service DepartmentSummaryService {
+  // GetSummary returns all departments with their user statistics.
+  rpc GetSummary (GetSummaryRequest) returns (GetSummaryResponse);
+}
+
+message GetSummaryRequest {}
+
+// Statistics for a single department.
+message DepartmentEntry {
+  int32            male         = 1;
+  int32            female       = 2;
+  string           age_range    = 3;
+  // hair colour → count
+  map<string, int32> hair       = 4;
+  // "FirstNameLastName" → postal code
+  map<string, string> address_user = 5;
+}
+
+message GetSummaryResponse {
+  // department name → DepartmentEntry
+  map<string, DepartmentEntry> departments = 1;
+}

@@ -1,0 +1,11 @@
+# GKE Managed Certificate for both assignment subdomains.
+# Apply once; provisioning takes ~15 minutes after DNS is pointed.
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: assignment-cert
+  namespace: assignment
+spec:
+  domains:
+    - assignment-web.lboevset.com
+    - assignment-api.lboevset.com

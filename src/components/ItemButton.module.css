@@ -1,0 +1,66 @@
+.btn {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  overflow: hidden;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.label {
+  display: block;
+  padding: 10px 16px;
+  text-align: left;
+}
+
+/* ── Main list style ─────────────────────────────────────── */
+.list {
+  background: #ffffff;
+  color: #1a1a2e;
+  border: 2px solid #e2e8f0;
+}
+
+.list:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+/* ── Column item style ───────────────────────────────────── */
+.column {
+  background: #6366f1;
+  color: #ffffff;
+  border: 2px solid transparent;
+}
+
+.column:hover {
+  background: #4f46e5;
+}
+
+/* ── Countdown progress bar ──────────────────────────────── */
+.progress {
+  display: block;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  transform-origin: left;
+  animation: countdown linear forwards;
+}
+
+@keyframes countdown {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}

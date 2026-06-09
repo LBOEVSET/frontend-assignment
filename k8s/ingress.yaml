@@ -1,0 +1,38 @@
+# Shared GKE Ingress for both assignment services.
+# Prerequisites:
+#   gcloud compute addresses create assignment-ip --global
+#   Point DNS:
+#     assignment-web.lboevset.com → <assignment-ip>
+#     assignment-api.lboevset.com → <assignment-ip>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: assignment-ingress
+  namespace: assignment
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "assignment-ip"
+    networking.gke.io/managed-certificates: "assignment-cert"
+    kubernetes.io/ingress.class: "gce"
+spec:
+  rules:
+    - host: assignment-web.lboevset.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-assignment
+                port:
+                  number: 80
+
+    - host: assignment-api.lboevset.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-challenge
+                port:
+                  number: 8080

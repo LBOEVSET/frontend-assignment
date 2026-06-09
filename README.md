@@ -1,3 +1,46 @@
+# Frontend Assignment — Implementation Notes
+
+> Original assignment requirements are preserved below.
+
+## Solution Overview
+
+### Part 1 — Auto-Delete Todo List
+
+React + TypeScript (Vite). Core logic lives in `src/hooks/useTodoList.ts`:
+
+- State: `mainList` (left column) and a `Map<id, ColumnItem>` for items currently in columns
+- `moveToColumn(item)` — removes from list, adds to column, starts `setTimeout(5000)`
+- `returnToMain(item)` — clears the timer via a `useRef` map, removes from column, appends to list
+- Countdown bar: pure CSS `scaleX` animation keyed on `addedAt` timestamp — no `setInterval`
+
+### Part 2 (Optional) — Users by Department
+
+`src/services/users.service.ts` exports two functions:
+- `fetchUsersByDepartment()` — fetches `https://dummyjson.com/users?limit=0` and calls the transformer
+- `groupByDepartment(users)` — pure function, easily unit-testable without network
+
+## Local development
+
+```bash
+npm install
+npm run dev     # http://localhost:5173
+```
+
+## Docker
+
+```bash
+docker build -t frontend-assignment .
+docker run -p 8080:80 frontend-assignment
+```
+
+## CI/CD (GKE)
+
+Push to `main` → GitHub Actions builds & pushes to `asia-southeast1-docker.pkg.dev/agentassistant-496719/assignment/frontend-assignment`, then rolls out to GKE namespace `assignment`.
+
+Required GitHub secrets: `GCP_PROJECT_ID`, `GKE_CLUSTER`, `GKE_ZONE`, `WIF_PROVIDER`.
+
+---
+
 # Assignment
 
 ## 1. Auto Delete Todo List
