@@ -1,5 +1,89 @@
 # Frontend Assignment
 
+## Getting Started
+
+### Prerequisites
+
+| Tool | Version | Check |
+|------|---------|-------|
+| Node.js | 20+ | `node -v` |
+| npm | 9+ | `npm -v` |
+
+### Initialize the project
+
+```bash
+# 1. Clone
+git clone https://github.com/<org>/frontend-assignment.git
+cd frontend-assignment
+
+# 2. Install dependencies
+npm install
+
+# 3. Start dev server
+npm run dev
+# React app:    http://localhost:5173
+# Express API:  http://localhost:3001
+```
+
+> **Tab 3 (Backend)** requires the Go API to be running on `:8080`.
+> To point it at the live GKE backend instead:
+> ```bash
+> BACKEND_URL=http://8.233.137.90 npm run dev
+> ```
+
+---
+
+## Unit Tests
+
+Tests use **Vitest** + **jsdom** + `@testing-library/react`. No external services needed.
+
+```bash
+# Run all tests (single run)
+npm test
+
+# Run with coverage report (+ enforces thresholds)
+npm run test:coverage
+```
+
+The coverage report prints a per-file table to the terminal:
+
+```
+File                              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------------------------------|---------|----------|---------|---------|------------------
+src/components/TodoApp.tsx        |  100.00 |   100.00 |  100.00 |  100.00 |
+src/hooks/useTodoList.ts          |  100.00 |    50.00 |  100.00 |  100.00 | 20
+src/pages/BackendPage.tsx         |   69.79 |    71.92 |   63.33 |   71.79 | 99-209,232,269
+...
+All files                         |   86.27 |    85.62 |   87.87 |   88.53 |
+```
+
+Coverage thresholds (CI fails if any drops below):
+
+| Metric     | Threshold |
+|------------|-----------|
+| Lines      | 80%       |
+| Functions  | 80%       |
+| Statements | 80%       |
+| Branches   | 65%       |
+
+Test files:
+
+| File | What it covers |
+|------|----------------|
+| `src/__tests__/App.test.tsx` | Top-level routing and tab switching |
+| `src/components/__tests__/TodoApp.test.tsx` | Item move and 5s auto-return |
+| `src/components/__tests__/ItemButton.test.tsx` | Render, click, countdown bar |
+| `src/components/__tests__/ColumnList.test.tsx` | Column render and click-back |
+| `src/components/__tests__/MainList.test.tsx` | List render and click |
+| `src/pages/__tests__/UsersPage.test.tsx` | Loading, data, cache panel, refresh |
+| `src/pages/__tests__/BackendPage.test.tsx` | Auth tabs, login/register flow, CRUD |
+| `src/pages/__tests__/LotteryPage.test.tsx` | Section labels, Redis keys, state machine |
+| `src/services/__tests__/users.service.test.ts` | Fetch, cache, refresh, error paths |
+| `src/services/__tests__/backend.service.test.ts` | All REST calls and error paths |
+| `src/services/__tests__/users.transform.test.ts` | Department grouping transform |
+
+---
+
 ## Solution Overview
 
 ### Part 1 — Auto-Delete Todo List
@@ -51,60 +135,6 @@ server/
 ```
 
 ---
-
-## Local Development
-
-**Prerequisites:** Node 20+, Go backend on `:8080` (optional for tab 3)
-
-```bash
-npm install
-npm run dev      # React on :5173, Express API on :3001
-```
-
-Vite proxies:
-- `/api/users/*` → `http://localhost:3001` (TypeScript Express)
-- `/api/v1/*` → `http://localhost:8080` or override via `BACKEND_URL`
-
-To point tab 3 at the live GKE backend:
-```bash
-BACKEND_URL=http://8.233.137.90 npm run dev
-```
-
----
-
-## Testing
-
-Tests use **Vitest** with jsdom and `@testing-library/react`.
-
-```bash
-npm test               # run all tests (watch mode)
-npm run test:coverage  # run with coverage report
-```
-
-Coverage thresholds (enforced in CI):
-
-| Metric     | Threshold |
-|------------|-----------|
-| Lines      | 80%       |
-| Functions  | 80%       |
-| Statements | 80%       |
-| Branches   | 65%       |
-
-Test files are co-located with source under `__tests__/` directories:
-
-| File | What it covers |
-|------|----------------|
-| `src/__tests__/App.test.tsx` | Top-level routing and tab switching |
-| `src/components/__tests__/TodoApp.test.tsx` | Item move and 5s auto-return |
-| `src/components/__tests__/ItemButton.test.tsx` | Render, click, countdown bar |
-| `src/components/__tests__/ColumnList.test.tsx` | Column render and click-back |
-| `src/components/__tests__/MainList.test.tsx` | List render and click |
-| `src/pages/__tests__/UsersPage.test.tsx` | Loading, data, cache panel, refresh |
-| `src/pages/__tests__/BackendPage.test.tsx` | Auth tabs, login/register flow, CRUD |
-| `src/pages/__tests__/LotteryPage.test.tsx` | Section labels, Redis keys, state machine |
-| `src/services/__tests__/users.service.test.ts` | Fetch, cache, refresh, error paths |
-| `src/services/__tests__/backend.service.test.ts` | All REST calls and error paths |
-| `src/services/__tests__/users.transform.test.ts` | Department grouping transform |
 
 ---
 
