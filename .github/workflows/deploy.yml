@@ -2,7 +2,7 @@ name: Build & Deploy Frontend Assignment
 
 on:
   push:
-    branches: [dev]
+    branches: [main, dev]
 
 env:
   PROJECT_ID: agentassistant-496719
