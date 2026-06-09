@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const BACKEND_URL = process.env.BACKEND_URL ?? 'http://localhost:8080';
+
 export default defineConfig({
   plugins: [react()],
   build: {
@@ -16,8 +18,9 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      // Forward /api/v1/* → Go backend (local or remote via BACKEND_URL).
       '/api/v1': {
-        target: 'http://localhost:8080',
+        target: BACKEND_URL,
         changeOrigin: true,
       },
     },
