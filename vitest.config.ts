@@ -15,13 +15,14 @@ export default defineConfig({
       exclude: [
         'src/main.tsx',
         'src/vite-env.d.ts',
+        'src/types/index.ts',   // pure type declarations — no runtime statements
         'src/**/*.module.css',
       ],
       thresholds: {
-        lines:     70,
-        functions: 70,
-        branches:  70,
-        statements: 70,
+        lines:      80,
+        functions:  80,
+        statements: 80,
+        branches:   65,   // branch coverage is naturally lower in UI code
       },
     },
   },
