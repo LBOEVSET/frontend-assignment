@@ -15,8 +15,9 @@ describe('LotteryPage', () => {
 
   it('renders Redis key names', () => {
     render(<LotteryPage />);
-    expect(screen.getByText(/bitmap:\{pos\}/)).toBeTruthy();
-    expect(screen.getByText(/queue:\{pattern\}/)).toBeTruthy();
+    // Use exact strings so we match the key-name div only, not its ancestors.
+    expect(screen.getByText('bitmap:{pos}:{digit}')).toBeTruthy();
+    expect(screen.getByText('queue:{pattern}')).toBeTruthy();
   });
 
   it('renders ticket state machine labels', () => {
@@ -28,7 +29,9 @@ describe('LotteryPage', () => {
 
   it('renders performance table rows', () => {
     render(<LotteryPage />);
-    expect(screen.getByText(/Bitmap AND/)).toBeTruthy();
-    expect(screen.getByText(/LPOP/)).toBeTruthy();
+    // Use full cell text — "Bitmap AND" appears in a section heading too,
+    // and "LPOP" appears in the concurrency section; exact match targets the table cells.
+    expect(screen.getByText('Bitmap AND (pattern match)')).toBeTruthy();
+    expect(screen.getByText('LPOP (ticket assign)')).toBeTruthy();
   });
 });

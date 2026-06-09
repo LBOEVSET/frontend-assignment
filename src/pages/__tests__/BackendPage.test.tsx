@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
+// window.confirm is used in handleDelete — return true so deletes proceed.
+vi.stubGlobal('confirm', () => true);
+
 vi.mock('../../services/backend.service', () => ({
   register:   vi.fn(),
   login:      vi.fn(),
@@ -20,7 +23,8 @@ beforeEach(() => { vi.clearAllMocks(); });
 describe('BackendPage — unauthenticated', () => {
   it('renders login and register tabs', () => {
     render(<BackendPage />);
-    expect(screen.getByText('Login')).toBeTruthy();
+    // Both "Login" tab and "Login" submit button are rendered — use getAllByText.
+    expect(screen.getAllByText('Login').length).toBeGreaterThan(0);
     expect(screen.getByText('Register')).toBeTruthy();
   });
 
@@ -36,7 +40,9 @@ describe('BackendPage — unauthenticated', () => {
     render(<BackendPage />);
     fireEvent.change(screen.getByPlaceholderText('jane@example.com'), { target: { value: 'a@b.com' } });
     fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'wrong' } });
-    fireEvent.click(screen.getByRole('button', { name: /Login/ }));
+    // The Login tab and the Login submit button both match /Login/ — take the last one (submit).
+    const loginBtns = screen.getAllByRole('button', { name: /Login/ });
+    fireEvent.click(loginBtns[loginBtns.length - 1]);
     await waitFor(() => expect(screen.getByText(/Invalid credentials/)).toBeTruthy());
   });
 
@@ -50,7 +56,9 @@ describe('BackendPage — unauthenticated', () => {
     fireEvent.change(screen.getByPlaceholderText('Jane Doe'),          { target: { value: 'Alice' } });
     fireEvent.change(screen.getByPlaceholderText('jane@example.com'),  { target: { value: 'alice@example.com' } });
     fireEvent.change(screen.getByPlaceholderText('••••••••'),          { target: { value: 'pass123' } });
-    fireEvent.click(screen.getByRole('button', { name: /Register/ }));
+    // After switching to Register mode both the tab and submit say "Register" — take last (submit).
+    const registerBtns = screen.getAllByRole('button', { name: /Register/ });
+    fireEvent.click(registerBtns[registerBtns.length - 1]);
     await waitFor(() => expect(vi.mocked(api.login)).toHaveBeenCalled());
   });
 });
@@ -62,7 +70,8 @@ describe('BackendPage — authenticated', () => {
     render(<BackendPage />);
     fireEvent.change(screen.getByPlaceholderText('jane@example.com'), { target: { value: 'alice@example.com' } });
     fireEvent.change(screen.getByPlaceholderText('••••••••'),         { target: { value: 'pass' } });
-    fireEvent.click(screen.getByRole('button', { name: /Login/ }));
+    const loginBtns = screen.getAllByRole('button', { name: /Login/ });
+    fireEvent.click(loginBtns[loginBtns.length - 1]);
     await waitFor(() => expect(screen.getByText('Alice')).toBeTruthy());
   }
 
@@ -73,20 +82,21 @@ describe('BackendPage — authenticated', () => {
 
   it('shows delete button per user', async () => {
     await login();
-    expect(screen.getAllByTitle(/Delete/).length).toBeGreaterThan(0);
+    // Delete buttons have text "Delete", no title attribute.
+    expect(screen.getAllByRole('button', { name: 'Delete' }).length).toBeGreaterThan(0);
   });
 
   it('deletes a user', async () => {
     vi.mocked(api.deleteUser).mockResolvedValueOnce({ message: 'deleted' });
     vi.mocked(api.listUsers).mockResolvedValue([]);
     await login();
-    fireEvent.click(screen.getAllByTitle(/Delete/)[0]);
+    fireEvent.click(screen.getAllByRole('button', { name: 'Delete' })[0]);
     await waitFor(() => expect(vi.mocked(api.deleteUser)).toHaveBeenCalled());
   });
 
-  it('shows create form when + New User is clicked', async () => {
+  it('shows create form when + Add user is clicked', async () => {
     await login();
-    fireEvent.click(screen.getByText(/New User/));
+    fireEvent.click(screen.getByText('+ Add user'));
     expect(screen.getByText('Create user')).toBeTruthy();
   });
 });
