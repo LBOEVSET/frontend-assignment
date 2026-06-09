@@ -2,24 +2,13 @@ import { DepartmentSummary, ApiMeta } from '../types';
 
 const API_URL = '/api/users/department-summary';
 const LS_KEY  = 'users_dept_data_v3';
-const TTL_MS  = 60 * 60 * 1000; // 1 hour
 
 export interface DepartmentResponse {
   data: Record<string, DepartmentSummary>;
   meta: ApiMeta;
 }
 
-// ── localStorage cache (data only — meta is always live) ─────────────────────
-
-function readCache(): Record<string, DepartmentSummary> | null {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return null;
-    const { data, ts }: { data: Record<string, DepartmentSummary>; ts: number } = JSON.parse(raw);
-    if (Date.now() - ts > TTL_MS) { localStorage.removeItem(LS_KEY); return null; }
-    return data;
-  } catch { return null; }
-}
+// ── localStorage cache (write-only — keeps data available offline) ───────────
 
 function writeCache(data: Record<string, DepartmentSummary>): void {
   try { localStorage.setItem(LS_KEY, JSON.stringify({ data, ts: Date.now() })); }
