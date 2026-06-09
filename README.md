@@ -1,51 +1,49 @@
-# Frontend Assignment — Implementation Notes
-
-> Original assignment requirements are preserved below.
+# Frontend Assignment
 
 ## Solution Overview
 
 ### Part 1 — Auto-Delete Todo List
 
-React + TypeScript (Vite). Core logic lives in `src/hooks/useTodoList.ts`:
+React + TypeScript (Vite). Core logic in `src/hooks/useTodoList.ts`:
 
-- State: `mainList` (left column) and a `Map<id, ColumnItem>` for items currently in columns
-- `moveToColumn(item)` — removes from list, adds to column, starts `setTimeout(5000)`
-- `returnToMain(item)` — clears the timer via a `useRef` map, removes from column, appends to list
-- Countdown bar: pure CSS `scaleX` animation keyed on `addedAt` timestamp — no `setInterval`
+- `moveToColumn(item)` — removes from main list, places in the type column, starts a 5s `setTimeout`
+- `returnToMain(item)` — cancels the timer, removes from column, appends to bottom of main list
+- Countdown bar: pure CSS `scaleX` animation driven by `addedAt` timestamp — no `setInterval`
 
 ### Part 2 — Users by Department
 
 `src/services/users.service.ts` fetches all users from `https://dummyjson.com/users` in parallel pages and groups them by department.
 
-- **Server-side cache** (1 hour TTL) in the TypeScript Express server — fast repeat requests
-- **`?force=true`** query param invalidates the cache for a fresh fetch
-- API response includes cache metadata: `responseTime`, `isCached`, `cacheAge`
-- Frontend shows a toggleable cache info panel and a "Fetch fresh data" button with tooltip
-- **gRPC** endpoint also available on port `50051` via `DepartmentSummaryService.GetSummary`
+- **Server-side cache** (1-hour TTL) in the TypeScript/Express server — fast repeat requests
+- **`?force=true`** query param bypasses the cache for a fresh fetch
+- API response includes `responseTime`, `isCached`, `cacheAge` metadata
+- gRPC endpoint on port `50051` via `DepartmentSummaryService.GetSummary`
 
 ### Part 3 — Backend Assignment Tab
 
-The same React app includes a third tab that connects to the Go backend (User Management API):
+The same React app connects to the Go backend (Part 3 of the assignment):
 
 - Login / Register auth flow → JWT stored in component state
-- Full user CRUD: list, create, edit, delete
-- Proxied through nginx (`/api/v1/` → `http://backend-challenge:8080`) in production
+- Full user CRUD: list, create, edit, delete via the Go REST API
+- Proxied through nginx in production (`/api/v1/` → `backend-challenge:8080`)
 
 ---
 
-## Architecture
+## Project Structure
 
 ```
 src/
-  components/       ← TodoApp, ColumnList, etc.
-  hooks/            ← useTodoList (core todo logic)
+  components/       ← TodoApp, ItemButton, ColumnList, MainList
+  hooks/            ← useTodoList (core todo state machine)
   pages/
-    UsersPage.tsx   ← Department summary UI
+    UsersPage.tsx   ← Department summary with cache info panel
     BackendPage.tsx ← Backend API UI (auth + CRUD)
+    LotteryPage.tsx ← Lottery Search System design proposal
   services/
-    users.service.ts    ← dummyjson fetch + cache
+    users.service.ts    ← dummyjson fetch + 1-hour server-side cache
     backend.service.ts  ← Go backend REST client
   types/            ← Shared TypeScript interfaces
+  __tests__/        ← App routing tests
 
 server/
   index.ts          ← Express API (:3001) + gRPC server (:50051)
@@ -56,23 +54,57 @@ server/
 
 ## Local Development
 
-**Prerequisites:** Node 20+, Go backend running on `:8080` (optional for tab 3)
+**Prerequisites:** Node 20+, Go backend on `:8080` (optional for tab 3)
 
 ```bash
 npm install
-npm run dev     # React on :5173, Express API on :3001
+npm run dev      # React on :5173, Express API on :3001
 ```
 
 Vite proxies:
-- `/api/users/*` → `http://localhost:3001`
-- `/api/v1/*` → `http://localhost:8080` (default) or override via `BACKEND_URL`
+- `/api/users/*` → `http://localhost:3001` (TypeScript Express)
+- `/api/v1/*` → `http://localhost:8080` or override via `BACKEND_URL`
 
-To point the proxy at the live GKE backend instead:
+To point tab 3 at the live GKE backend:
 ```bash
 BACKEND_URL=http://8.233.137.90 npm run dev
 ```
 
-No `.env` file needed — `BACKEND_URL` is not sensitive and defaults to `localhost:8080` in `vite.config.ts`.
+---
+
+## Testing
+
+Tests use **Vitest** with jsdom and `@testing-library/react`.
+
+```bash
+npm test               # run all tests (watch mode)
+npm run test:coverage  # run with coverage report
+```
+
+Coverage thresholds (enforced in CI):
+
+| Metric     | Threshold |
+|------------|-----------|
+| Lines      | 80%       |
+| Functions  | 80%       |
+| Statements | 80%       |
+| Branches   | 65%       |
+
+Test files are co-located with source under `__tests__/` directories:
+
+| File | What it covers |
+|------|----------------|
+| `src/__tests__/App.test.tsx` | Top-level routing and tab switching |
+| `src/components/__tests__/TodoApp.test.tsx` | Item move and 5s auto-return |
+| `src/components/__tests__/ItemButton.test.tsx` | Render, click, countdown bar |
+| `src/components/__tests__/ColumnList.test.tsx` | Column render and click-back |
+| `src/components/__tests__/MainList.test.tsx` | List render and click |
+| `src/pages/__tests__/UsersPage.test.tsx` | Loading, data, cache panel, refresh |
+| `src/pages/__tests__/BackendPage.test.tsx` | Auth tabs, login/register flow, CRUD |
+| `src/pages/__tests__/LotteryPage.test.tsx` | Section labels, Redis keys, state machine |
+| `src/services/__tests__/users.service.test.ts` | Fetch, cache, refresh, error paths |
+| `src/services/__tests__/backend.service.test.ts` | All REST calls and error paths |
+| `src/services/__tests__/users.transform.test.ts` | Department grouping transform |
 
 ---
 
@@ -91,12 +123,28 @@ nginx serves the React static files and proxies API routes internally.
 
 ## CI/CD (GKE)
 
-Push to `main` or `dev` → GitHub Actions:
+Push to `main` or `dev` → GitHub Actions runs two jobs:
+
+**Job 1 — Test & SonarQube scan:**
+1. `npm ci` and `npm run test:coverage` — fails if any threshold is missed
+2. SonarQube scan via `SonarSource/sonarqube-scan-action@v6`
+3. Quality Gate check — fails build if gate is RED
+
+**Job 2 — Build & deploy** (runs only if Job 1 passes):
 1. Builds with `docker buildx --platform linux/amd64`
 2. Pushes to `asia-southeast1-docker.pkg.dev/agentassistant-496719/assignment/frontend-assignment`
 3. Rolls out to GKE namespace `assignment`
 
-**Required GitHub secrets:** `GCP_PROJECT_ID`, `GKE_CLUSTER`, `GKE_ZONE`, `WIF_PROVIDER`
+**Required GitHub secrets:**
+
+| Secret | Purpose |
+|--------|---------|
+| `GCP_PROJECT_ID` | GCP project ID |
+| `GKE_CLUSTER` | GKE cluster name |
+| `GKE_ZONE` | GKE cluster zone |
+| `WIF_PROVIDER` | Workload Identity Federation provider |
+| `SONARQUBE_URL` | `http://<sonarqube-external-ip>:9000` |
+| `SONARQUBE_TOKEN` | SonarQube analysis token |
 
 **Live URL:** `http://8.233.137.90`
 
