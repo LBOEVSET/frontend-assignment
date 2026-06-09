@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react';
 import { TodoApp } from './components/TodoApp';
 import { UsersPage } from './pages/UsersPage';
 import { BackendPage } from './pages/BackendPage';
+import { LotteryPage } from './pages/LotteryPage';
 import { fetchUsersByDepartment } from './services/users.service';
 import './App.css';
 
-type Assignment = 'frontend' | 'backend';
+type Assignment = 'frontend' | 'backend' | 'lottery';
 type FrontendTab = 'todo' | 'users';
 
 function getInitialAssignment(): Assignment {
-  return window.location.hash === '#backend' ? 'backend' : 'frontend';
+  if (window.location.hash === '#backend') return 'backend';
+  if (window.location.hash === '#lottery') return 'lottery';
+  return 'frontend';
 }
 function getInitialFrontendTab(): FrontendTab {
   return window.location.hash === '#users' ? 'users' : 'todo';
@@ -21,7 +24,9 @@ export default function App() {
 
   const switchAssignment = (a: Assignment) => {
     setAssignment(a);
-    window.location.hash = a === 'backend' ? 'backend' : frontendTab;
+    window.location.hash = a === 'backend' ? 'backend'
+      : a === 'lottery' ? 'lottery'
+      : frontendTab;
   };
 
   const switchFrontendTab = (tab: FrontendTab) => {
@@ -33,9 +38,9 @@ export default function App() {
     fetchUsersByDepartment();
   }, []);
 
-  const title = assignment === 'frontend'
-    ? '7Solutions Frontend Assignment'
-    : '7Solutions Backend Assignment';
+  const title = assignment === 'frontend' ? '7Solutions Frontend Assignment'
+    : assignment === 'backend' ? '7Solutions Backend Assignment'
+    : 'Lottery Search System — Design Proposal';
 
   return (
     <div className="app">
@@ -55,6 +60,12 @@ export default function App() {
           >
             Backend Assignment
           </button>
+          <button
+            className={`assignment-btn ${assignment === 'lottery' ? 'assignment-btn--active' : ''}`}
+            onClick={() => switchAssignment('lottery')}
+          >
+            Lottery Search System
+          </button>
         </div>
 
         {/* ── Title ── */}
@@ -63,6 +74,7 @@ export default function App() {
         {/* ── Sub-tabs (frontend only) ── */}
         {assignment === 'frontend' && (
           <nav className="tabs">
+
             <button
               className={`tab ${frontendTab === 'todo' ? 'tab--active' : ''}`}
               onClick={() => switchFrontendTab('todo')}
@@ -83,6 +95,7 @@ export default function App() {
         {assignment === 'frontend' && frontendTab === 'todo'  && <TodoApp />}
         {assignment === 'frontend' && frontendTab === 'users' && <UsersPage />}
         {assignment === 'backend'                             && <BackendPage />}
+        {assignment === 'lottery'                             && <LotteryPage />}
       </main>
     </div>
   );

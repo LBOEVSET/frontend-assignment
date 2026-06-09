@@ -1,0 +1,113 @@
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 900px; margin: 0 auto; }
+
+.section {}
+.sectionLabel {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #64748b; margin-bottom: 10px;
+}
+
+.card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 12px; padding: 20px 22px;
+  overflow-x: auto;
+}
+
+/* ── Architecture ── */
+.arch { display: flex; align-items: center; gap: 4px; min-width: 600px; }
+.archCol { display: flex; flex-direction: column; gap: 8px; }
+.archArrow { font-size: 20px; color: #94a3b8; padding: 0 10px; }
+.archBox {
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 8px; padding: 10px 16px; min-width: 120px; text-align: center;
+}
+.boxLabel { font-size: 13px; font-weight: 600; color: #1e293b; }
+.boxSub   { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+.indigo { border-color: #6366f1; }
+.indigo .boxLabel { color: #6366f1; }
+.green  { border-color: #22c55e; }
+.green .boxLabel  { color: #16a34a; }
+.amber  { border-color: #f59e0b; }
+.amber .boxLabel  { color: #d97706; }
+
+/* ── Pattern ── */
+.patternRow { display: flex; align-items: center; gap: 12px; min-width: 560px; }
+.patternInput {
+  font-family: monospace; font-size: 20px; font-weight: 700;
+  background: #eef2ff; border: 1px solid #6366f1;
+  border-radius: 6px; padding: 6px 16px; color: #4f46e5; letter-spacing: 4px;
+}
+.stepArrow { font-size: 14px; color: #94a3b8; }
+.parseNote { font-size: 13px; color: #475569; }
+.parseNote strong { color: #4f46e5; }
+
+.bitmapGrid { display: flex; gap: 5px; }
+.bitmapCell {
+  width: 40px; height: 42px; border-radius: 6px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; font-size: 14px; font-weight: 700;
+}
+.bitmapPos { font-size: 9px; color: #94a3b8; margin-bottom: 2px; font-weight: 400; }
+.bitmapActive   { background: #eef2ff; border: 1.5px solid #6366f1; color: #4f46e5; }
+.bitmapInactive { background: #f8fafc; border: 1px solid #e2e8f0;   color: #cbd5e1; }
+
+.andOp   { font-size: 13px; font-weight: 700; color: #6366f1; padding: 0 6px; }
+.resultBox {
+  background: #f0fdf4; border: 1px solid #86efac;
+  border-radius: 6px; padding: 6px 14px;
+  font-size: 12px; color: #16a34a; font-family: monospace;
+}
+.patternNote { margin-top: 14px; font-size: 11px; color: #94a3b8; }
+
+/* ── Redis ── */
+.redisGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-width: 500px; }
+.redisKey { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; }
+.redisKeyName { font-family: monospace; font-size: 12px; color: #d97706; margin-bottom: 6px; font-weight: 600; }
+.redisKeyDesc { font-size: 11px; color: #64748b; white-space: pre-line; line-height: 1.6; }
+
+/* ── Concurrency ── */
+.concurrentRow { display: flex; gap: 12px; align-items: flex-start; min-width: 560px; }
+.userFlow { display: flex; flex-direction: column; gap: 5px; min-width: 140px; }
+.userLabel { font-size: 11px; font-weight: 700; color: #64748b; }
+.userStep {
+  font-size: 11px; font-family: monospace;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 5px; padding: 5px 10px; color: #475569;
+}
+.userStepGot { border-color: #86efac; color: #16a34a; background: #f0fdf4; }
+.queueBox {
+  flex: 1; min-width: 200px;
+  background: #f5f3ff; border: 1px solid #c4b5fd;
+  border-radius: 8px; padding: 12px 16px;
+}
+.queueTitle { font-size: 12px; font-weight: 700; color: #7c3aed; margin-bottom: 8px; }
+.queueBody  { font-family: monospace; font-size: 11px; color: #6b7280; white-space: pre-wrap; line-height: 1.8; }
+
+.returnArc {
+  margin-top: 14px; font-size: 11px; color: #94a3b8;
+  border-top: 1px dashed #e2e8f0; padding-top: 10px; text-align: center;
+}
+
+/* ── State machine ── */
+.states { display: flex; align-items: center; gap: 4px; min-width: 500px; }
+.state { border-radius: 8px; padding: 12px 20px; text-align: center; min-width: 120px; }
+.stateName { font-size: 13px; font-weight: 700; }
+.stateSub  { font-size: 10px; margin-top: 3px; opacity: 0.7; }
+.stateAvailable { background: #eff6ff; border: 1px solid #93c5fd; }
+.stateAvailable .stateName { color: #1d4ed8; }
+.stateReserved  { background: #fffbeb; border: 1px solid #fcd34d; }
+.stateReserved .stateName  { color: #b45309; }
+.stateAssigned  { background: #f0fdf4; border: 1px solid #86efac; }
+.stateAssigned .stateName  { color: #16a34a; }
+.stateArrow { display: flex; flex-direction: column; align-items: center; padding: 0 6px; }
+.stateArrow div:first-child { font-size: 20px; color: #94a3b8; }
+.stateArrowLbl { font-size: 9px; color: #94a3b8; text-align: center; max-width: 65px; }
+
+/* ── Performance table ── */
+.perfTable { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 480px; }
+.perfTable th {
+  text-align: left; color: #64748b; font-weight: 600;
+  padding: 7px 10px; border-bottom: 1px solid #e2e8f0; font-size: 11px;
+}
+.perfTable td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #475569; }
+.mono { font-family: monospace; color: #4f46e5 !important; }
+.fast { color: #16a34a !important; font-weight: 600; }

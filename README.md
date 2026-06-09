@@ -65,7 +65,14 @@ npm run dev     # React on :5173, Express API on :3001
 
 Vite proxies:
 - `/api/users/*` → `http://localhost:3001`
-- `/api/v1/*` → `http://localhost:8080`
+- `/api/v1/*` → `http://localhost:8080` (default) or override via `BACKEND_URL`
+
+To point the proxy at the live GKE backend instead:
+```bash
+BACKEND_URL=http://8.233.137.90 npm run dev
+```
+
+No `.env` file needed — `BACKEND_URL` is not sensitive and defaults to `localhost:8080` in `vite.config.ts`.
 
 ---
 
