@@ -39,6 +39,12 @@ jobs:
         run: npm run test:coverage
         # Fails the job if coverage drops below the thresholds defined in
         # vitest.config.ts (70% lines / functions / branches / statements)
+        # Also writes test-results.xml (JUnit format via Vitest junit reporter)
+
+      - name: Convert JUnit to SonarQube Generic format
+        # sonar.testExecutionReportPaths requires SonarQube's own Generic XML
+        # format, not JUnit. This step converts Vitest's JUnit output.
+        run: node scripts/junit-to-sonar-generic.mjs test-results.xml sonar-test-results.xml
 
       - name: SonarQube scan
         uses: SonarSource/sonarqube-scan-action@v6
