@@ -18,7 +18,10 @@ import * as api from '../../services/backend.service';
 
 const mockUser = { id: '1', name: 'Alice', email: 'alice@example.com', created_at: '2024-01-01T00:00:00Z' };
 
-beforeEach(() => { vi.clearAllMocks(); });
+beforeEach(() => {
+  vi.clearAllMocks();
+  sessionStorage.clear();
+});
 
 describe('BackendPage — unauthenticated', () => {
   it('renders login and register tabs', () => {
@@ -98,5 +101,27 @@ describe('BackendPage — authenticated', () => {
     await login();
     fireEvent.click(screen.getByText('+ Add user'));
     expect(screen.getByText('Create user')).toBeTruthy();
+  });
+
+  it('persists session to sessionStorage on login', async () => {
+    await login();
+    expect(sessionStorage.getItem('backend_token')).toBe('tok');
+    expect(sessionStorage.getItem('backend_email')).toBe('alice@example.com');
+  });
+
+  it('clears sessionStorage on logout', async () => {
+    await login();
+    fireEvent.click(screen.getByText('Logout'));
+    expect(sessionStorage.getItem('backend_token')).toBeNull();
+    expect(sessionStorage.getItem('backend_email')).toBeNull();
+  });
+
+  it('restores session from sessionStorage on mount', async () => {
+    sessionStorage.setItem('backend_token', 'saved-tok');
+    sessionStorage.setItem('backend_email', 'saved@example.com');
+    vi.mocked(api.listUsers).mockResolvedValue([mockUser]);
+    render(<BackendPage />);
+    // Should skip the login form and show the session bar directly.
+    await waitFor(() => expect(screen.getByText(/saved@example.com/)).toBeTruthy());
   });
 });

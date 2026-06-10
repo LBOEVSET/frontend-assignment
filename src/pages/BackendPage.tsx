@@ -245,11 +245,16 @@ function UsersSection({ token }: { token: string }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
+const TOKEN_KEY = 'backend_token';
+const EMAIL_KEY = 'backend_email';
+
 export function BackendPage() {
-  const [token, setToken] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
+  const [token, setToken] = useState<string | null>(() => sessionStorage.getItem(TOKEN_KEY));
+  const [email, setEmail] = useState(() => sessionStorage.getItem(EMAIL_KEY) ?? '');
 
   const handleToken = (t: string, e: string) => {
+    sessionStorage.setItem(TOKEN_KEY, t);
+    sessionStorage.setItem(EMAIL_KEY, e);
     setToken(t);
     setEmail(e);
   };
@@ -266,7 +271,7 @@ export function BackendPage() {
         <>
           <div className={css.sessionBar}>
             <span>Logged in as <strong>{email}</strong></span>
-            <button className={css.logoutBtn} onClick={() => { setToken(null); setEmail(''); }}>
+            <button className={css.logoutBtn} onClick={() => { sessionStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(EMAIL_KEY); setToken(null); setEmail(''); }}>
               Logout
             </button>
           </div>
