@@ -22,6 +22,12 @@ async function req<T>(
   return json as T;
 }
 
+// ── Health ────────────────────────────────────────────────────────────────────
+
+export function pingHealth() {
+  return req<{ status: string }>('GET', '/health');
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export function register(name: string, email: string, password: string) {

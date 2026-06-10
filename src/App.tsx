@@ -4,6 +4,7 @@ import { UsersPage } from './pages/UsersPage';
 import { BackendPage } from './pages/BackendPage';
 import { LotteryPage } from './pages/LotteryPage';
 import { fetchUsersByDepartment } from './services/users.service';
+import { pingHealth } from './services/backend.service';
 import './App.css';
 
 type Assignment = 'frontend' | 'backend' | 'lottery';
@@ -36,6 +37,7 @@ export default function App() {
 
   useEffect(() => {
     fetchUsersByDepartment();
+    pingHealth().catch(() => {}); // fire-and-forget: triggers visitor tracking on the backend
   }, []);
 
   const title = assignment === 'frontend' ? '7Solutions Frontend Assignment'

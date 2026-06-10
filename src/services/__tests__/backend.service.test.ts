@@ -15,6 +15,25 @@ function err(body: unknown, status = 400) {
 
 beforeEach(() => vi.clearAllMocks());
 
+// ── pingHealth ────────────────────────────────────────────────────────────────
+
+describe('pingHealth', () => {
+  it('GETs /api/v1/health and returns status', async () => {
+    ok({ status: 'ok' });
+    const res = await api.pingHealth();
+    expect(mockFetch).toHaveBeenCalledWith(
+      '/api/v1/health',
+      expect.objectContaining({ method: 'GET' }),
+    );
+    expect(res.status).toBe('ok');
+  });
+
+  it('throws on non-ok response', async () => {
+    err({ error: 'service unavailable' }, 503);
+    await expect(api.pingHealth()).rejects.toThrow('service unavailable');
+  });
+});
+
 // ── register ──────────────────────────────────────────────────────────────────
 
 describe('register', () => {

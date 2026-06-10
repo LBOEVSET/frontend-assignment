@@ -8,6 +8,10 @@ vi.mock('../services/users.service', () => ({
   }),
 }));
 
+vi.mock('../services/backend.service', () => ({
+  pingHealth: vi.fn().mockResolvedValue({ status: 'ok' }),
+}));
+
 // Stub heavy pages to isolate App routing logic.
 vi.mock('../pages/BackendPage', () => ({ BackendPage: () => <div>BackendPageStub</div> }));
 vi.mock('../pages/LotteryPage', () => ({ LotteryPage: () => <div>LotteryPageStub</div> }));
