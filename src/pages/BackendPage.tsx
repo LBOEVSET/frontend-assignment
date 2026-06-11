@@ -61,27 +61,26 @@ function AuthCard({ onToken }: { onToken: (t: string, e: string, r: string) => v
               <input value={form.name} onChange={set('name')} placeholder="Jane Doe" required />
             </div>
             <div className={css.field}>
-              <label>Role</label>
-              <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <label htmlFor="auth-role-user">Role</label>
+              <div style={{ display: 'flex', gap: '16px', marginTop: '4px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <input
+                    id="auth-role-user"
                     type="radio"
                     name="role"
                     value="user"
                     checked={form.role === 'user'}
                     onChange={set('role')}
-                  />
-                  User
+                  /><span>User</span>
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <input
                     type="radio"
                     name="role"
                     value="admin"
                     checked={form.role === 'admin'}
                     onChange={set('role')}
-                  />
-                  Admin
+                  /><span>Admin</span>
                 </label>
               </div>
             </div>
@@ -167,17 +166,15 @@ function UserForm({ initial, token, onSave, onCancel }: UserFormProps) {
                 />
               </div>
               <div className={css.field}>
-                <label>Role</label>
-                <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <input type="radio" name="create-role" value="user"
-                      checked={role === 'user'} onChange={e => setRole(e.target.value)} />
-                    User
+                <label htmlFor="form-role-user">Role</label>
+                <div style={{ display: 'flex', gap: '16px', marginTop: '4px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <input id="form-role-user" type="radio" name="create-role" value="user"
+                      checked={role === 'user'} onChange={e => setRole(e.target.value)} /><span>User</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <input type="radio" name="create-role" value="admin"
-                      checked={role === 'admin'} onChange={e => setRole(e.target.value)} />
-                    Admin
+                      checked={role === 'admin'} onChange={e => setRole(e.target.value)} /><span>Admin</span>
                   </label>
                 </div>
               </div>
@@ -199,9 +196,9 @@ function UserForm({ initial, token, onSave, onCancel }: UserFormProps) {
 // ── Users section (requires token) ───────────────────────────────────────────
 
 interface UsersSectionProps {
-  token: string;
-  email: string;
-  callerRole: string;
+  readonly token: string;
+  readonly email: string;
+  readonly callerRole: string;
 }
 
 function UsersSection({ token, email, callerRole }: UsersSectionProps) {
