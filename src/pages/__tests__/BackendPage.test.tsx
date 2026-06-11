@@ -162,8 +162,8 @@ describe('BackendPage — authenticated', () => {
     const loginBtns = screen.getAllByRole('button', { name: /Login/ });
     fireEvent.click(loginBtns[loginBtns.length - 1]);
     await waitFor(() => expect(screen.getByText('Bob')).toBeTruthy());
-    // Admin can see Delete for Bob (user role) but not for Alice (admin role)
-    expect(screen.getAllByRole('button', { name: 'Delete' })).toHaveLength(1);
+    // Admin sees Delete for own row (self-edit) + Bob's row (user role) = 2
+    expect(screen.getAllByRole('button', { name: 'Delete' })).toHaveLength(2);
   });
 
   it('admin role: shows Edit/Delete for own row, hides for other admin rows', async () => {
