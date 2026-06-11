@@ -7,12 +7,12 @@ import css from './BackendPage.module.css';
 
 type AuthMode = 'login' | 'register';
 
-interface FormState { name: string; email: string; password: string; }
-const empty = (): FormState => ({ name: '', email: '', password: '' });
+interface FormState { name: string; email: string; password: string; role: string; }
+const empty = (): FormState => ({ name: '', email: '', password: '', role: 'user' });
 
 // ── Auth card ─────────────────────────────────────────────────────────────────
 
-function AuthCard({ onToken }: { onToken: (t: string, e: string) => void }) {
+function AuthCard({ onToken }: { onToken: (t: string, e: string, r: string) => void }) {
   const [mode, setMode]     = useState<AuthMode>('login');
   const [form, setForm]     = useState<FormState>(empty());
   const [busy, setBusy]     = useState(false);
@@ -28,11 +28,11 @@ function AuthCard({ onToken }: { onToken: (t: string, e: string) => void }) {
     setBusy(true);
     try {
       if (mode === 'register') {
-        await api.register(form.name, form.email, form.password);
+        await api.register(form.name, form.email, form.password, form.role);
         setOk('Registered! Logging in…');
       }
-      const { token } = await api.login(form.email, form.password);
-      onToken(token, form.email);
+      const { token, role } = await api.login(form.email, form.password);
+      onToken(token, form.email, role);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : 'Unknown error');
     } finally {
@@ -55,10 +55,37 @@ function AuthCard({ onToken }: { onToken: (t: string, e: string) => void }) {
 
       <form className={css.form} onSubmit={submit}>
         {mode === 'register' && (
-          <div className={css.field}>
-            <label>Name</label>
-            <input value={form.name} onChange={set('name')} placeholder="Jane Doe" required />
-          </div>
+          <>
+            <div className={css.field}>
+              <label>Name</label>
+              <input value={form.name} onChange={set('name')} placeholder="Jane Doe" required />
+            </div>
+            <div className={css.field}>
+              <label>Role</label>
+              <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <input
+                    type="radio"
+                    name="role"
+                    value="user"
+                    checked={form.role === 'user'}
+                    onChange={set('role')}
+                  />
+                  User
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <input
+                    type="radio"
+                    name="role"
+                    value="admin"
+                    checked={form.role === 'admin'}
+                    onChange={set('role')}
+                  />
+                  Admin
+                </label>
+              </div>
+            </div>
+          </>
         )}
         <div className={css.field}>
           <label>Email</label>
@@ -93,6 +120,7 @@ function UserForm({ initial, token, onSave, onCancel }: UserFormProps) {
   const [name,     setName]     = useState(initial?.name ?? '');
   const [email,    setEmail]    = useState(initial?.email ?? '');
   const [password, setPassword] = useState('');
+  const [role,     setRole]     = useState('user');
   const [busy,     setBusy]     = useState(false);
   const [err,      setErr]      = useState('');
 
@@ -104,7 +132,7 @@ function UserForm({ initial, token, onSave, onCancel }: UserFormProps) {
       if (initial) {
         await api.updateUser(token, initial.id, { name, email });
       } else {
-        await api.createUser(token, name, email, password);
+        await api.createUser(token, name, email, password, role);
       }
       onSave();
     } catch (e: unknown) {
@@ -128,15 +156,32 @@ function UserForm({ initial, token, onSave, onCancel }: UserFormProps) {
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
           </div>
           {!initial && (
-            <div className={css.field}>
-              <label>Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-              />
-            </div>
+            <>
+              <div className={css.field}>
+                <label>Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className={css.field}>
+                <label>Role</label>
+                <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <input type="radio" name="create-role" value="user"
+                      checked={role === 'user'} onChange={e => setRole(e.target.value)} />
+                    User
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <input type="radio" name="create-role" value="admin"
+                      checked={role === 'admin'} onChange={e => setRole(e.target.value)} />
+                    Admin
+                  </label>
+                </div>
+              </div>
+            </>
           )}
         </div>
         {err && <p className={css.error}>{err}</p>}
@@ -153,7 +198,13 @@ function UserForm({ initial, token, onSave, onCancel }: UserFormProps) {
 
 // ── Users section (requires token) ───────────────────────────────────────────
 
-function UsersSection({ token }: { token: string }) {
+interface UsersSectionProps {
+  token: string;
+  email: string;
+  callerRole: string;
+}
+
+function UsersSection({ token, email, callerRole }: UsersSectionProps) {
   const [users,    setUsers]    = useState<BackendUser[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [err,      setErr]      = useState('');
@@ -182,6 +233,18 @@ function UsersSection({ token }: { token: string }) {
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Delete failed');
     }
+  };
+
+  /**
+   * canMutate returns true when the logged-in user is allowed to edit/delete a row.
+   *   self  → always allowed (any role can edit their own account)
+   *   admin → can touch any other user whose role is NOT admin
+   *   user  → can only touch their own row (covered by self check above)
+   */
+  const canMutate = (u: BackendUser) => {
+    if (u.email === email) return true;          // self-edit always allowed
+    if (callerRole === 'admin') return u.role !== 'admin';
+    return false;
   };
 
   return (
@@ -221,20 +284,37 @@ function UsersSection({ token }: { token: string }) {
           {users.map(u => (
             <div key={u.id} className={css.userRow}>
               <div className={css.userInfo}>
-                <div className={css.userName}>{u.name}</div>
+                <div className={css.userName}>
+                  {u.name}
+                  <span style={{
+                    marginLeft: 8,
+                    fontSize: '0.7rem',
+                    padding: '1px 6px',
+                    borderRadius: 4,
+                    background: u.role === 'admin' ? '#1a1a2e' : '#e8f4fd',
+                    color: u.role === 'admin' ? '#fff' : '#2563eb',
+                    fontWeight: 600,
+                  }}>
+                    {u.role ?? 'user'}
+                  </span>
+                </div>
                 <div className={css.userEmail}>{u.email}</div>
                 <div className={css.userDate}>
                   Created: {new Date(u.created_at).toLocaleString()}
                 </div>
               </div>
-              <button
-                className={css.editBtn}
-                onClick={() => { setEditing(u); setCreating(false); }}
-              >Edit</button>
-              <button
-                className={css.deleteBtn}
-                onClick={() => handleDelete(u.id)}
-              >Delete</button>
+              {canMutate(u) && (
+                <>
+                  <button
+                    className={css.editBtn}
+                    onClick={() => { setEditing(u); setCreating(false); }}
+                  >Edit</button>
+                  <button
+                    className={css.deleteBtn}
+                    onClick={() => handleDelete(u.id)}
+                  >Delete</button>
+                </>
+              )}
             </div>
           ))}
         </div>
@@ -247,16 +327,29 @@ function UsersSection({ token }: { token: string }) {
 
 const TOKEN_KEY = 'backend_token';
 const EMAIL_KEY = 'backend_email';
+const ROLE_KEY  = 'backend_role';
 
 export function BackendPage() {
   const [token, setToken] = useState<string | null>(() => sessionStorage.getItem(TOKEN_KEY));
   const [email, setEmail] = useState(() => sessionStorage.getItem(EMAIL_KEY) ?? '');
+  const [role,  setRole]  = useState(() => sessionStorage.getItem(ROLE_KEY) ?? 'user');
 
-  const handleToken = (t: string, e: string) => {
+  const handleToken = (t: string, e: string, r: string) => {
     sessionStorage.setItem(TOKEN_KEY, t);
     sessionStorage.setItem(EMAIL_KEY, e);
+    sessionStorage.setItem(ROLE_KEY, r);
     setToken(t);
     setEmail(e);
+    setRole(r);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(EMAIL_KEY);
+    sessionStorage.removeItem(ROLE_KEY);
+    setToken(null);
+    setEmail('');
+    setRole('user');
   };
 
   return (
@@ -270,12 +363,25 @@ export function BackendPage() {
       ) : (
         <>
           <div className={css.sessionBar}>
-            <span>Logged in as <strong>{email}</strong></span>
-            <button className={css.logoutBtn} onClick={() => { sessionStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(EMAIL_KEY); setToken(null); setEmail(''); }}>
+            <span>
+              Logged in as <strong>{email}</strong>
+              <span style={{
+                marginLeft: 8,
+                fontSize: '0.7rem',
+                padding: '1px 6px',
+                borderRadius: 4,
+                background: role === 'admin' ? '#1a1a2e' : '#e8f4fd',
+                color: role === 'admin' ? '#fff' : '#2563eb',
+                fontWeight: 600,
+              }}>
+                {role}
+              </span>
+            </span>
+            <button className={css.logoutBtn} onClick={handleLogout}>
               Logout
             </button>
           </div>
-          <UsersSection token={token} />
+          <UsersSection token={token} email={email} callerRole={role} />
         </>
       )}
     </div>

@@ -44,5 +44,6 @@ export interface BackendUser {
   id: string;
   name: string;
   email: string;
+  role: string; // "admin" | "user"
   created_at: string; // Go serializes as snake_case
 }

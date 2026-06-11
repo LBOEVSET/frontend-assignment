@@ -30,12 +30,12 @@ export function pingHealth() {
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
-export function register(name: string, email: string, password: string) {
-  return req<BackendUser>('POST', '/auth/register', undefined, { name, email, password });
+export function register(name: string, email: string, password: string, role?: string) {
+  return req<BackendUser>('POST', '/auth/register', undefined, { name, email, password, ...(role ? { role } : {}) });
 }
 
 export function login(email: string, password: string) {
-  return req<{ token: string }>('POST', '/auth/login', undefined, { email, password });
+  return req<{ token: string; role: string }>('POST', '/auth/login', undefined, { email, password });
 }
 
 // ── Users (authenticated) ─────────────────────────────────────────────────────
@@ -44,8 +44,8 @@ export function listUsers(token: string) {
   return req<BackendUser[]>('GET', '/users', token);
 }
 
-export function createUser(token: string, name: string, email: string, password: string) {
-  return req<BackendUser>('POST', '/users', token, { name, email, password });
+export function createUser(token: string, name: string, email: string, password: string, role?: string) {
+  return req<BackendUser>('POST', '/users', token, { name, email, password, ...(role ? { role } : {}) });
 }
 
 export function updateUser(token: string, id: string, fields: { name?: string; email?: string }) {
