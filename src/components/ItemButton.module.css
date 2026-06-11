@@ -64,3 +64,8 @@
   from { transform: scaleX(1); }
   to   { transform: scaleX(0); }
 }
+
+@media (max-width: 600px) {
+  .btn { font-size: 0.8rem; }
+  .label { padding: 7px 10px; }
+}

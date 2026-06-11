@@ -43,3 +43,9 @@
   font-size: 0.875rem;
   padding: 4px 0;
 }
+
+@media (max-width: 600px) {
+  .section { min-width: 0; padding: 10px; }
+  .title { font-size: 0.75rem; }
+  .list { gap: 5px; min-height: 30px; }
+}

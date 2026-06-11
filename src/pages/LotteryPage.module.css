@@ -111,3 +111,11 @@
 .perfTable td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #475569; }
 .mono { font-family: monospace; color: #4f46e5 !important; }
 .fast { color: #16a34a !important; font-weight: 600; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Diagrams with min-width scroll horizontally inside their card */
+  .card { padding: 14px 12px; }
+  .redisGrid { grid-template-columns: 1fr; }
+  .concurrentRow { flex-direction: column; }
+}

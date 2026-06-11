@@ -104,3 +104,40 @@ body {
   margin: 0 auto;
   width: 100%;
 }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .assignment-switcher {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 12px 0 10px;
+  }
+
+  .assignment-btn {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+  }
+
+  .app-title {
+    font-size: 1rem;
+    margin: 12px 0 12px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .tab {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+
+  .app-main {
+    padding: 16px;
+  }
+}

@@ -149,3 +149,11 @@
 
 .yes { color: #16a34a; font-weight: 600; }
 .no  { color: #dc2626; font-weight: 600; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+  .topRow { flex-direction: column; }
+  .metaBar { align-items: flex-start; }
+  .tooltip { left: 0; top: 28px; width: 240px; }
+}

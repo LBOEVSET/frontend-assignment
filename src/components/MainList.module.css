@@ -22,3 +22,9 @@
   flex-direction: column;
   gap: 8px;
 }
+
+@media (max-width: 600px) {
+  .section { min-width: 0; flex: 1; }
+  .title { font-size: 0.75rem; }
+  .list { gap: 5px; }
+}

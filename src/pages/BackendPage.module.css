@@ -159,3 +159,17 @@
 .deleteBtn:hover { background: #ffe4e6; }
 
 .emptyState { text-align: center; color: #94a3b8; padding: 32px; font-size: 0.9rem; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .authCard { max-width: 100%; padding: 16px; }
+
+  .formRow { flex-direction: column; }
+  .formRow .field { min-width: unset; }
+
+  .userRow { flex-wrap: wrap; gap: 8px; }
+  .userInfo { width: 100%; }
+  .editBtn, .deleteBtn { flex: 1; text-align: center; }
+
+  .sessionBar { flex-wrap: wrap; }
+}

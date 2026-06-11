@@ -11,8 +11,10 @@ export function TodoApp() {
     <div className={styles.wrapper}>
       <MainList items={mainList} onItemClick={moveToColumn} />
       <div className={styles.divider} />
-      <ColumnList type="Fruit"     items={fruitItems}     onItemClick={returnToMain} />
-      <ColumnList type="Vegetable" items={vegetableItems} onItemClick={returnToMain} />
+      <div className={styles.columns}>
+        <ColumnList type="Fruit"     items={fruitItems}     onItemClick={returnToMain} />
+        <ColumnList type="Vegetable" items={vegetableItems} onItemClick={returnToMain} />
+      </div>
     </div>
   );
 }
